@@ -26,25 +26,25 @@ http://localhost:5173
 
 3. 주력으로 사용한 컴포넌트에대한 설명 및 사용 이유 기입
 
-1. Ant Design - Calendar
+3-1. Ant Design - Calendar
 `Calendar` 컴포넌트는 캘린더 UI를 제공하며, 날짜별 할 일을 관리할 수 있습니다. 
 날짜를 선택하면 해당 날짜에 일정 추가 모달을 띄울 수 있습니다. 
 이 컴포넌트는 직관적인 날짜별 뷰를 제공하여 사용자가 쉽게 일정을 추가하고 관리할 수 있게 합니다.
 
-2. Ant Design - Modal & Form
+3-2. Ant Design - Modal & Form
 일정을 추가할 때 `Modal`과 `Form` 컴포넌트를 사용하여 사용자로부터 제목을 입력받습니다. 
 `Modal`은 일정 추가를 위한 팝업 창을 띄우며, `Form`을 사용해 유효성 검사와 함께 데이터를 관리합니다.
 
-3. Ant Design - Checkbox & DeleteOutlined
+3-3. Ant Design - Checkbox & DeleteOutlined
 각 할 일 항목에 대해 `Checkbox`를 사용하여 완료 여부를 표시하고, 
 `DeleteOutlined` 아이콘을 사용하여 할 일을 삭제할 수 있는 기능을 제공합니다. 
 `Checkbox`는 할 일의 상태를 직관적으로 관리하게 도와주며, 삭제 아이콘은 할 일을 제거할 수 있게 합니다.
 
-4. dayjs
+3-4. dayjs
 `dayjs`는 날짜와 시간을 간편하게 처리하는 라이브러리로, `Calendar` 컴포넌트에서 날짜 형식을 지정하고, 
 날짜를 변경하거나 계산할 때 사용됩니다.
 
-5. React Context API (TodoContext)
+3-5. React Context API (TodoContext)
 `TodoContext`는 할 일 데이터를 전역 상태로 관리하는 데 사용됩니다. 
 앱의 다른 컴포넌트들이 전역적으로 할 일 목록에 접근하고 수정할 수 있도록 도와줍니다. 
 `useTodo` 훅을 사용하여 `addTodo`, `toggleTodo`, `deleteTodo` 등의 함수를 제공하며, 
