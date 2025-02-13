@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Form } from "antd";
 import type { Dayjs } from "dayjs";
 import dayjs from "dayjs";
 import { useTodo } from "../contexts/TodoContext";
+import axiosInstance from "../utils/axiosInstance";
 
 export const useCalendar = () => {
   const { todos, addTodo, deleteTodo, toggleTodo } = useTodo();
@@ -10,6 +11,27 @@ export const useCalendar = () => {
   const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
   const [form] = Form.useForm();
   const [currentDate, setCurrentDate] = useState<Dayjs>(dayjs());
+
+  const fetchTodosFromBackend = async () => {
+    try {
+      const response = await axiosInstance.get("/api/calendar/events");
+      const events = response.data;
+
+      events.forEach((event: { title: string; date: string }) => {
+        addTodo({
+          title: event.title,
+          date: event.date,
+          completed: false,
+        });
+      });
+    } catch (error) {
+      console.error("Error fetching calendar events", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchTodosFromBackend();
+  }, []);
 
   const handleSelect = (date: Dayjs) => {
     setSelectedDate(date);
@@ -25,15 +47,23 @@ export const useCalendar = () => {
     form.resetFields();
   };
 
-  const handleFormSubmit = (values: { title: string }) => {
+  const handleFormSubmit = async (values: { title: string }) => {
     if (selectedDate) {
-      addTodo({
+      const newTodo = {
         title: values.title,
         date: selectedDate.format("YYYY-MM-DD"),
         completed: false,
-      });
-      setIsModalOpen(false);
-      form.resetFields();
+      };
+
+
+      try {
+        await axiosInstance.post("/api/calendar/events", newTodo);
+        addTodo(newTodo); 
+        setIsModalOpen(false);
+        form.resetFields();
+      } catch (error) {
+        console.error("Error adding todo", error);
+      }
     }
   };
 
