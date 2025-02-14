@@ -14,9 +14,12 @@ export const useCalendar = () => {
 
   const fetchTodosFromBackend = async () => {
     try {
-      const response = await axiosInstance.get("/api/calendar/events");
+      console.log("Fetching events from the backend...");
+      const response = await axiosInstance.get("/api/events");
+      console.log("Fetched events successfully:", response.data);
+  
       const events = response.data;
-
+  
       events.forEach((event: { title: string; date: string }) => {
         addTodo({
           title: event.title,
@@ -28,6 +31,7 @@ export const useCalendar = () => {
       console.error("Error fetching calendar events", error);
     }
   };
+  
 
   useEffect(() => {
     fetchTodosFromBackend();
@@ -54,11 +58,20 @@ export const useCalendar = () => {
         date: selectedDate.format("YYYY-MM-DD"),
         completed: false,
       };
-
-
+  
       try {
-        await axiosInstance.post("/api/calendar/events", newTodo);
-        addTodo(newTodo); 
+        console.log("Sending new event to backend:", newTodo);
+        const response = await axiosInstance.post("/api/events", newTodo);
+        console.log("Event created successfully:", response.data);
+  
+        const createdEvent = response.data;
+  
+        addTodo({
+          title: createdEvent.title,
+          date: createdEvent.date,
+          completed: createdEvent.completed,
+        });
+  
         setIsModalOpen(false);
         form.resetFields();
       } catch (error) {

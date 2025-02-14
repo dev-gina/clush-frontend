@@ -15,12 +15,16 @@ export const AddTodoModal = ({
     okText="추가"
     cancelText="취소"
   >
-    <Form onFinish={onOk}>
+    <Form onFinish={onOk} layout="vertical">
       <Form.Item
-        name="title"
+        name="title"  
+        label="일정 제목"
         rules={[{ required: true, message: "일정 내용을 입력해주세요" }]}
       >
-        <Input placeholder="일정 내용을 입력하세요" />
+        <Input 
+          placeholder="일정 내용을 입력하세요"
+          id="eventTitle"  
+        />
       </Form.Item>
     </Form>
   </Modal>
