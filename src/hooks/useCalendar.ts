@@ -2,40 +2,75 @@ import { useState, useEffect } from "react";
 import { Form } from "antd";
 import type { Dayjs } from "dayjs";
 import dayjs from "dayjs";
-import { useTodo } from "../contexts/TodoContext";
 import axiosInstance from "../utils/axiosInstance";
 
+interface Todo {
+  id?: number;
+  title: string;
+  date: string;
+  completed: boolean;
+}
+
 export const useCalendar = () => {
-  const { todos, addTodo, deleteTodo, toggleTodo } = useTodo();
+  const [todos, setTodos] = useState<Todo[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
   const [form] = Form.useForm();
   const [currentDate, setCurrentDate] = useState<Dayjs>(dayjs());
 
-  const fetchTodosFromBackend = async () => {
+  // 모든 일정 가져오기
+  const fetchTodos = async () => {
     try {
-      console.log("Fetching events from the backend...");
       const response = await axiosInstance.get("/api/events");
-      console.log("Fetched events successfully:", response.data);
-  
-      const events = response.data;
-  
-      events.forEach((event: { title: string; date: string }) => {
-        addTodo({
-          title: event.title,
-          date: event.date,
-          completed: false,
-        });
-      });
+      setTodos(response.data);
     } catch (error) {
-      console.error("Error fetching calendar events", error);
+      console.error("Failed to fetch todos:", error);
     }
   };
-  
 
+  // 초기 데이터 로드
   useEffect(() => {
-    fetchTodosFromBackend();
+    fetchTodos();
   }, []);
+
+  // 새로운 일정 추가
+  const addTodo = async (todo: Omit<Todo, "id">) => {
+    try {
+      const response = await axiosInstance.post("/api/events", todo);
+      setTodos(prev => [...prev, response.data]);
+    } catch (error) {
+      console.error("Failed to add todo:", error);
+    }
+  };
+
+  // 일정 삭제
+  const deleteTodo = async (id: number) => {
+    try {
+      await axiosInstance.delete(`/api/events/${id}`);
+      setTodos(prev => prev.filter(todo => todo.id !== id));
+    } catch (error) {
+      console.error("Failed to delete todo:", error);
+    }
+  };
+
+  // 일정 완료 상태 토글
+  const toggleTodo = async (id: number, completed: boolean) => {
+    try {
+      const todoToUpdate = todos.find(todo => todo.id === id);
+      if (!todoToUpdate) return;
+
+      const response = await axiosInstance.put(`/api/events/${id}`, {
+        ...todoToUpdate,
+        completed: !completed
+      });
+      
+      setTodos(prev => prev.map(todo => 
+        todo.id === id ? response.data : todo
+      ));
+    } catch (error) {
+      console.error("Failed to toggle todo:", error);
+    }
+  };
 
   const handleSelect = (date: Dayjs) => {
     setSelectedDate(date);
@@ -53,30 +88,13 @@ export const useCalendar = () => {
 
   const handleFormSubmit = async (values: { title: string }) => {
     if (selectedDate) {
-      const newTodo = {
+      await addTodo({ 
         title: values.title,
         date: selectedDate.format("YYYY-MM-DD"),
         completed: false,
-      };
-  
-      try {
-        console.log("Sending new event to backend:", newTodo);
-        const response = await axiosInstance.post("/api/events", newTodo);
-        console.log("Event created successfully:", response.data);
-  
-        const createdEvent = response.data;
-  
-        addTodo({
-          title: createdEvent.title,
-          date: createdEvent.date,
-          completed: createdEvent.completed,
-        });
-  
-        setIsModalOpen(false);
-        form.resetFields();
-      } catch (error) {
-        console.error("Error adding todo", error);
-      }
+      });
+      setIsModalOpen(false);
+      form.resetFields();
     }
   };
 
@@ -86,6 +104,7 @@ export const useCalendar = () => {
   };
 
   return {
+    todos,
     currentDate,
     setCurrentDate,
     selectedDate,
