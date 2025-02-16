@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState } from "react";
 
 export interface Todo {
   id: string;
@@ -17,16 +17,7 @@ interface TodoContextType {
 const TodoContext = createContext<TodoContextType | undefined>(undefined);
 
 export function TodoProvider({ children }: { children: React.ReactNode }) {
-  // 초기 상태를 localStorage에서 읽어옴
-  const [todos, setTodos] = useState<Todo[]>(() => {
-    const stored = localStorage.getItem("todos");
-    return stored ? JSON.parse(stored) : [];
-  });
-
-  // todos가 변경될 때마다 localStorage에 저장
-  useEffect(() => {
-    localStorage.setItem("todos", JSON.stringify(todos));
-  }, [todos]);
+  const [todos, setTodos] = useState<Todo[]>([]);
 
   const addTodo = (todo: Omit<Todo, "id">) => {
     setTodos([...todos, { ...todo, id: Date.now().toString() }]);

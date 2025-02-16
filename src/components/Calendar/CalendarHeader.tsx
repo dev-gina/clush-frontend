@@ -4,7 +4,6 @@ import { calendarStyles } from "./styles";
 
 export const CalendarHeader = ({ value, onChange }: CalendarHeaderProps) => {
   const handleMonthChange = (num: number) => {
-    console.log("handleMonthChange called with:", num);
     const newValue = value.clone().add(num, "month");
     onChange(newValue);
   };
@@ -18,7 +17,6 @@ export const CalendarHeader = ({ value, onChange }: CalendarHeaderProps) => {
         style={calendarStyles.header.icon}
         onClick={(e) => {
           e.stopPropagation();
-          console.log("Left icon clicked");
           handleMonthChange(-1);
         }}
       />
@@ -32,7 +30,6 @@ export const CalendarHeader = ({ value, onChange }: CalendarHeaderProps) => {
         style={calendarStyles.header.icon}
         onClick={(e) => {
           e.stopPropagation();
-          console.log("Right icon clicked");
           handleMonthChange(1);
         }}
       />
